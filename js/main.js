@@ -177,27 +177,244 @@ function createCourtHeatmap(data2014, data2024) {
     // 3. Add a toggle/button to switch the data source between 2014 and 2024.
 }
 
-/**
- * [Vis 3 - LINKED PART 1] Creates the efficiency vs. volume scatter plot.
- * @param {Array} data - The raw shot data.
- */
-function createEfficiencyScatterPlot(data) {
-    // 1. Process the data: group by player to get total shots and FG%.
-    // 2. Create scales and axes.
-    // 3. Draw circles for each player.
-    // 4. Implement D3-brush. On the "end" event of the brush,
-    //    call an update function for Vis 4, passing the selected player data.
+// Helper to map a playerName --> player stats, full return:
+// Map(playerName -> { player, threePA_pg, threePA_total, threePM, threePCT, corner3A, aboveBreakA })
+function buildPlayerThreePointStats(raw) {
+    const byPlayer = d3.rollup(
+        raw,
+        v0 => {
+            const v = v0.filter(r => {
+                if (r.SHOT_TYPE) return String(r.SHOT_TYPE).includes('3PT');
+                const z = r.BASIC_ZONE;
+                return z === 'Above the Break 3' || z === 'Left Corner 3' || z === 'Right Corner 3';
+            });
+
+            const threePA_total = v.length;
+            const threePM = d3.sum(v, r => String(r.SHOT_MADE).toLowerCase() === 'true' ? 1 : 0);
+
+            let corner3A = 0;
+            for (const r of v) {
+                const z = r.BASIC_ZONE;
+                if (z === 'Left Corner 3' || z === 'Right Corner 3') corner3A++;
+            }
+            const aboveBreakA = threePA_total - corner3A;
+
+            const threePCT = threePA_total ? threePM / threePA_total : 0;
+
+            const games = new Set(v.map(r => r.GAME_ID)).size || 1;
+            const threePA_pg = threePA_total / games;
+
+            return { threePA_pg, threePA_total, threePM, threePCT, corner3A, aboveBreakA };
+        },
+        r => r.PLAYER_NAME
+    );
+
+    const out = new Map();
+    for (const [player, stats] of byPlayer) out.set(player, { player, ...stats });
+    return out;
 }
 
-/**
- * [Vis 4 - LINKED PART 2] Creates the player shot profile stacked bar chart.
- * @param {Array} data - The raw shot data.
- */
-function createPlayerProfileChart(data) {
-    // 1. Set up the chart area, but don't draw any bars initially.
-    // 2. Create an "update" function that takes a list of players as an argument.
-    // 3. This update function will filter the main dataset, calculate the shot
-    //    profiles for the selected players, and draw/update the stacked bars.
+// Helper to calculate Aggregate Corner vs Above-Break profile for a set of players
+// To-do: test this function more, it glitches sometimes
+function computeShotProfileForPlayers(playerSet, playerStatsMap) {
+    let corner = 0, above = 0;
+    playerSet.forEach(p => {
+        const s = playerStatsMap.get(p);
+        if (!s) return;
+        corner += s.corner3A;
+        above  += s.aboveBreakA;
+    });
+    const total = corner + above;
+    return total > 0
+        ? { corner, above, total, cornerPct: corner/total, abovePct: above/total }
+        : { corner: 0, above: 0, total: 0, cornerPct: 0, abovePct: 0 };
+}
+
+const link = d3.dispatch("selection");
+
+/*************** Vis 3 — Efficiency vs Volume (3PA/game vs 3P%) ***************/
+function createEfficiencyScatterPlot(data2024) {
+    const statsMap = buildPlayerThreePointStats(data2024);
+    const data = Array.from(statsMap.values())
+        .filter(d => d.threePA_total >= 10); // guardrail to reduce noise
+
+    const container = d3.select("#efficiency-scatter-plot");
+    container.html("");
+    const containerWidth = container.node().getBoundingClientRect().width;
+    const margin = { top: 30, right: 20, bottom: 50, left: 60 };
+    const width  = containerWidth - margin.left - margin.right;
+    const height = 420 - margin.top - margin.bottom;
+
+    const svg = container.append("svg")
+        .attr("width",  width + margin.left + margin.right)
+        .attr("height", height + margin.top  + margin.bottom);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.threePA_pg) || 5]).nice()
+        .range([0, width]);
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.threePCT) || 0.5]).nice()
+        .range([height, 0]);
+
+    g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+    g.append("g").call(d3.axisLeft(y).tickFormat(d3.format(".0%")));
+
+    g.append("text").attr("x", width/2).attr("y", height+40).attr("text-anchor","middle")
+        .text("3PA per game (volume)");
+    g.append("text").attr("transform","rotate(-90)").attr("x", -height/2).attr("y", -45)
+        .attr("text-anchor","middle").text("3P% (efficiency)");
+
+    const tooltip = d3.select("body").append("div")
+        .attr("class","tooltip").style("position","absolute").style("pointer-events","none").style("opacity",0);
+
+    const dots = g.selectAll("circle.dot")
+        .data(data, d => d.player)
+        .join("circle")
+        .attr("class","dot")
+        .attr("cx", d => x(d.threePA_pg))
+        .attr("cy", d => y(d.threePCT))
+        .attr("r", 4)
+        .attr("fill", "#1d428a")
+        .attr("opacity", 0.9)
+        .on("mousemove", (event, d) => {
+            tooltip.style("opacity", 1)
+                .html(
+                    `<strong>${d.player}</strong><br/>
+           3PA/g: ${d.threePA_pg.toFixed(2)}<br/>
+           3P%: ${(d.threePCT*100).toFixed(1)}%<br/>
+           Corner 3A: ${d.corner3A}<br/>
+           Above-break 3A: ${d.aboveBreakA}`
+                )
+                .style("left", (event.pageX + 10) + "px")
+                .style("top",  (event.pageY - 28) + "px");
+        })
+        .on("mouseleave", () => tooltip.style("opacity", 0));
+
+    const brush = d3.brush()
+        .extent([[0,0],[width,height]])
+        .on("start brush end", brushed);
+    g.append("g").attr("class","brush").call(brush);
+
+    function brushed(event) {
+        const s = event.selection;
+        const selected = new Set();
+        if (s) {
+            const [[x0,y0],[x1,y1]] = s;
+            dots.classed("selected", d => {
+                const inside = x0 <= x(d.threePA_pg) && x(d.threePA_pg) <= x1 &&
+                    y0 <= y(d.threePCT)   && y(d.threePCT)   <= y1;
+                if (inside) selected.add(d.player);
+                return inside;
+            }).attr("fill", d => selected.has(d.player) ? "#c8102e" : "#1d428a");
+        } else {
+            dots.classed("selected", false).attr("fill", "#1d428a");
+        }
+        link.call("selection", null, selected);
+    }
+}
+
+/*************** Vis 4 — Linked Player Shot Profile (Corner vs Above) ***************/
+function createPlayerProfileChart(data2024) {
+    const statsMap   = buildPlayerThreePointStats(data2024);
+    const allPlayers = new Set(statsMap.keys());
+
+    const container = d3.select("#player-profile-chart");
+    container.html("");
+    const containerWidth = container.node().getBoundingClientRect().width;
+    const margin = { top: 30, right: 20, bottom: 45, left: 60 };
+    const width  = containerWidth - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
+
+    const svg = container.append("svg")
+        .attr("width",  width + margin.left + margin.right)
+        .attr("height", height + margin.top  + margin.bottom);
+
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+        .domain(["Corner 3", "Above-the-Break 3"])
+        .range([0, width])
+        .padding(0.35);
+
+    const y = d3.scaleLinear()
+        .domain([0, 1])
+        .range([height, 0])
+        .nice();
+
+    g.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+    g.append("g")
+        .call(d3.axisLeft(y).tickFormat(d3.format(".0%")));
+
+    const title = g.append("text")
+        .attr("x", 0)
+        .attr("y", -10)
+        .attr("class", "profile-title")
+        .text("Shot profile: No selection (showing all players)");
+
+    const barsG = g.append("g");
+
+    function render(profile) {
+        const data = [
+            { key: "Corner 3", value: profile.cornerPct },
+            { key: "Above-the-Break 3", value: profile.abovePct }
+        ];
+
+        const bars = barsG.selectAll("rect").data(data, d => d.key);
+        bars.join(
+            enter => enter.append("rect")
+                .attr("x", d => x(d.key))
+                .attr("width", x.bandwidth())
+                .attr("y", y(0))
+                .attr("height", 0)
+                .attr("fill", d => d.key === "Corner 3" ? "#f26f21" : "#1d428a")
+                .call(enter => enter.transition().duration(500)
+                    .attr("y", d => y(d.value))
+                    .attr("height", d => y(0) - y(d.value))),
+            update => update.transition().duration(500)
+                .attr("x", d => x(d.key))
+                .attr("width", x.bandwidth())
+                .attr("y", d => y(d.value))
+                .attr("height", d => y(0) - y(d.value)),
+            exit => exit.remove()
+        );
+
+        const labels = barsG.selectAll("text.value").data(data, d => d.key);
+        labels.join(
+            enter => enter.append("text")
+                .attr("class", "value")
+                .attr("text-anchor", "middle")
+                .attr("x", d => x(d.key) + x.bandwidth()/2)
+                .attr("y", y(0) - 4)
+                .text(d => d3.format(".0%")(d.value))
+                .call(enter => enter.transition().duration(500)
+                    .attr("y", d => y(d.value) - 6)),
+            update => update
+                .transition().duration(500)
+                .attr("x", d => x(d.key) + x.bandwidth()/2)
+                .attr("y", d => y(d.value) - 6)
+                .tween("text", function(d){
+                    const prev = +String(this.textContent || "0%").replace('%','')/100 || 0;
+                    const i = d3.interpolateNumber(prev, d.value);
+                    return t => { this.textContent = d3.format(".0%")(i(t)); };
+                }),
+            exit => exit.remove()
+        );
+    }
+
+    render(computeShotProfileForPlayers(allPlayers, statsMap));
+
+    link.on("selection.playerProfile", (selectedSet) => {
+        const active = (selectedSet && selectedSet.size) ? selectedSet : allPlayers;
+        const who = (selectedSet && selectedSet.size)
+            ? `Selected group (${selectedSet.size} players)`
+            : "No selection (showing all players)";
+        title.text(`Shot profile: ${who}`);
+        render(computeShotProfileForPlayers(active, statsMap));
+    });
 }
 
 /**
