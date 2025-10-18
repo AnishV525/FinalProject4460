@@ -7,7 +7,7 @@ Promise.all([
     createCourtHeatmap(data2014, data2024);
     createEfficiencyScatterPlot(data2024);
     createPlayerProfileChart(data2024);
-    createPositionMatrix(data2024);
+    createPositionMatrix(data2014, data2024);
 
 }).catch(error => {
     console.error("Error loading the CSV data: ", error);
@@ -202,13 +202,379 @@ function createPlayerProfileChart(data) {
 
 /**
  * [Vis 5] Creates a matrix showing shot distribution by player position.
- * @param {Array} data - The raw shot data.
+ * @param {Array} data2014 - The raw shot data from 2014.
+ * @param {Array} data2024 - The raw shot data from 2024.
  */
-function createPositionMatrix(data) {
-    // 1. Process data: Group by Position, then by Shot Zone, and count the shots.
-    // 2. Create scales for rows (Positions) and columns (Shot Zones).
-    // 3. Draw rectangles (or circles) for each cell in the matrix.
-    // 4. Use a color scale to represent the percentage of shots for that position.
+function createPositionMatrix(data2014, data2024) {
+    console.log("Vis 5: Position Shot Matrix Heatmap function called.");
+    
+    // Process data for both seasons
+    const matrix2014 = processPositionMatrixData(data2014);
+    const matrix2024 = processPositionMatrixData(data2024);
+    
+    // Get unique positions and zones
+    const positions = ['Guard', 'Forward', 'Center'];
+    const zones = ['Restricted Area', 'In The Paint (Non-RA)', 'Mid-Range', 'Above the Break 3', 'Left Corner 3', 'Right Corner 3'];
+    
+    // Create container
+    const container = d3.select("#position-matrix-chart");
+    container.html("");
+    
+    // Create tooltip
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+    
+    // Set up dimensions - fit within viewport
+    const containerWidth = container.node().getBoundingClientRect().width - 40; // Account for padding
+    const containerHeight = container.node().getBoundingClientRect().height - 40;
+    const margin = { top: 60, right: 80, bottom: 100, left: 100 };
+    const heatmapWidth = (containerWidth - margin.left - margin.right) / 2 - 60;
+    const heatmapHeight = Math.min(containerHeight - margin.top - margin.bottom, 400);
+    const totalWidth = containerWidth;
+    const totalHeight = containerHeight;
+    
+    // Create SVG
+    const svg = container
+        .append("svg")
+        .attr("width", totalWidth)
+        .attr("height", totalHeight)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // Add arrow marker definition
+    svg.append("defs").append("marker")
+        .attr("id", "arrowhead")
+        .attr("markerWidth", 10)
+        .attr("markerHeight", 7)
+        .attr("refX", 9)
+        .attr("refY", 3.5)
+        .attr("orient", "auto")
+        .append("polygon")
+        .attr("points", "0 0, 10 3.5, 0 7")
+        .attr("fill", "#c8102e");
+    
+    // Create scales - make cells square
+    const cellSize = Math.min(heatmapWidth / zones.length, heatmapHeight / positions.length) * 0.9;
+    
+    const xScale = d3.scaleBand()
+        .domain(zones)
+        .range([0, heatmapWidth])
+        .padding(0.1);
+    
+    const yScale = d3.scaleBand()
+        .domain(positions)
+        .range([0, heatmapHeight])
+        .padding(0.1);
+    
+    // NBA color scheme - using orange to red gradient
+    const colorScale = d3.scaleSequential(d3.interpolateOranges)
+        .domain([0, d3.max([...matrix2014, ...matrix2024], d => d.percentage)]);
+    
+    // Create 2014 heatmap
+    const heatmap2014 = svg.append("g")
+        .attr("class", "heatmap-2014")
+        .attr("transform", `translate(0, 0)`);
+    
+    // Add 2014 title
+    heatmap2014.append("text")
+        .attr("class", "season-title")
+        .attr("x", heatmapWidth / 2)
+        .attr("y", -20)
+        .text("2014 Season Total Shots %");
+    
+    // Add 2014 cells
+    const cellGroup2014 = heatmap2014.selectAll(".cell-group-2014")
+        .data(matrix2014)
+        .join("g")
+        .attr("class", "cell-group-2014")
+        .attr("transform", d => `translate(${xScale(d.zone)}, ${yScale(d.position)})`);
+    
+    cellGroup2014.append("rect")
+        .attr("class", "heatmap-cell cell-2014")
+        .attr("width", xScale.bandwidth())
+        .attr("height", yScale.bandwidth())
+        .attr("fill", d => colorScale(d.percentage))
+        .on("mouseover", function(event, d) {
+            tooltip.transition().duration(200).style("opacity", .9);
+            tooltip.html(`
+                <strong>2014 Season</strong><br/>
+                Position: ${d.position}<br/>
+                Zone: ${d.zone}<br/>
+                Shots: ${d.count}<br/>
+                Percentage: ${(d.percentage * 100).toFixed(1)}%
+            `)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            tooltip.transition().duration(500).style("opacity", 0);
+        });
+    
+    // Add percentage labels to 2014 cells
+    cellGroup2014.append("text")
+        .attr("class", "cell-percentage")
+        .attr("x", xScale.bandwidth() / 2)
+        .attr("y", yScale.bandwidth() / 2)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("font-size", "11px")
+        .style("font-weight", "bold")
+        .style("fill", d => d.percentage > 0.3 ? "white" : "#333")
+        .text(d => `${(d.percentage * 100).toFixed(1)}%`);
+    
+    // Add 2014 axes
+    heatmap2014.append("g")
+        .attr("class", "x-axis-2014")
+        .attr("transform", `translate(0, ${heatmapHeight})`)
+        .call(d3.axisBottom(xScale))
+        .selectAll("text")
+        .attr("class", "zone-label")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-60)")
+        .style("font-size", "10px");
+    
+    heatmap2014.append("g")
+        .attr("class", "y-axis-2014")
+        .call(d3.axisLeft(yScale))
+        .selectAll("text")
+        .attr("class", "position-label");
+    
+    // Create 2024 heatmap
+    const heatmap2024 = svg.append("g")
+        .attr("class", "heatmap-2024")
+        .attr("transform", `translate(${heatmapWidth + 80}, 0)`);
+    
+    // Add 2024 title
+    heatmap2024.append("text")
+        .attr("class", "season-title")
+        .attr("x", heatmapWidth / 2)
+        .attr("y", -20)
+        .text("2024 Season Total Shots %");
+    
+    // Add 2024 cells
+    const cellGroup2024 = heatmap2024.selectAll(".cell-group-2024")
+        .data(matrix2024)
+        .join("g")
+        .attr("class", "cell-group-2024")
+        .attr("transform", d => `translate(${xScale(d.zone)}, ${yScale(d.position)})`);
+    
+    cellGroup2024.append("rect")
+        .attr("class", "heatmap-cell cell-2024")
+        .attr("width", xScale.bandwidth())
+        .attr("height", yScale.bandwidth())
+        .attr("fill", d => colorScale(d.percentage))
+        .on("mouseover", function(event, d) {
+            tooltip.transition().duration(200).style("opacity", .9);
+            tooltip.html(`
+                <strong>2024 Season</strong><br/>
+                Position: ${d.position}<br/>
+                Zone: ${d.zone}<br/>
+                Shots: ${d.count}<br/>
+                Percentage: ${(d.percentage * 100).toFixed(1)}%
+            `)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            tooltip.transition().duration(500).style("opacity", 0);
+        });
+    
+    // Add percentage labels to 2024 cells
+    cellGroup2024.append("text")
+        .attr("class", "cell-percentage")
+        .attr("x", xScale.bandwidth() / 2)
+        .attr("y", yScale.bandwidth() / 2)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("font-size", "11px")
+        .style("font-weight", "bold")
+        .style("fill", d => d.percentage > 0.3 ? "white" : "#333")
+        .text(d => `${(d.percentage * 100).toFixed(1)}%`);
+    
+    // Add 2024 axes
+    heatmap2024.append("g")
+        .attr("class", "x-axis-2024")
+        .attr("transform", `translate(0, ${heatmapHeight})`)
+        .call(d3.axisBottom(xScale))
+        .selectAll("text")
+        .attr("class", "zone-label")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-60)")
+        .style("font-size", "10px");
+    
+    heatmap2024.append("g")
+        .attr("class", "y-axis-2024")
+        .call(d3.axisLeft(yScale))
+        .selectAll("text")
+        .attr("class", "position-label");
+    
+    // Add comparison arrows and labels - REMOVED per user request
+    // addComparisonArrows(svg, matrix2014, matrix2024, xScale, yScale, heatmapWidth, heatmapHeight);
+    
+    // Add color legend - REMOVED per user request
+    // addColorLegend(svg, colorScale, heatmapWidth, heatmapHeight);
+}
+
+/**
+ * Processes raw shot data to create position matrix data
+ * @param {Array} data - The raw shot data
+ * @returns {Array} Processed matrix data
+ */
+function processPositionMatrixData(data) {
+    const positionGroups = ['G', 'F', 'C'];
+    const positionLabels = { 'G': 'Guard', 'F': 'Forward', 'C': 'Center' };
+    const zones = ['Restricted Area', 'In The Paint (Non-RA)', 'Mid-Range', 'Above the Break 3', 'Left Corner 3', 'Right Corner 3'];
+    
+    // Count shots by position and zone
+    const counts = {};
+    positionGroups.forEach(pos => {
+        counts[pos] = {};
+        zones.forEach(zone => {
+            counts[pos][zone] = 0;
+        });
+    });
+    
+    data.forEach(d => {
+        const position = d.POSITION_GROUP;
+        const zone = d.BASIC_ZONE;
+        if (positionGroups.includes(position) && zones.includes(zone)) {
+            counts[position][zone]++;
+        }
+    });
+    
+    // Calculate percentages
+    const matrix = [];
+    positionGroups.forEach(pos => {
+        const totalShots = zones.reduce((sum, zone) => sum + counts[pos][zone], 0);
+        zones.forEach(zone => {
+            const count = counts[pos][zone];
+            const percentage = totalShots > 0 ? count / totalShots : 0;
+            matrix.push({
+                position: positionLabels[pos], // Use full word instead of letter
+                zone: zone,
+                count: count,
+                percentage: percentage
+            });
+        });
+    });
+    
+    return matrix;
+}
+
+/**
+ * Adds comparison arrows between the two heatmaps
+ */
+function addComparisonArrows(svg, matrix2014, matrix2024, xScale, yScale, heatmapWidth, heatmapHeight) {
+    const arrowSpacing = 80;
+    const startX = heatmapWidth + 40;
+    const endX = heatmapWidth + 40;
+    
+    // Find significant changes
+    const significantChanges = [];
+    matrix2014.forEach(d2014 => {
+        const d2024 = matrix2024.find(d => d.position === d2014.position && d.zone === d2014.zone);
+        if (d2024) {
+            const change = d2024.percentage - d2014.percentage;
+            if (Math.abs(change) > 0.05) { // 5% threshold
+                significantChanges.push({
+                    position: d2014.position,
+                    zone: d2014.zone,
+                    change: change,
+                    x: xScale(d2014.zone) + xScale.bandwidth() / 2,
+                    y: yScale(d2014.position) + yScale.bandwidth() / 2
+                });
+            }
+        }
+    });
+    
+    // Draw arrows for top 3 changes
+    const topChanges = significantChanges
+        .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
+        .slice(0, 3);
+    
+    topChanges.forEach((change, i) => {
+        const arrowY = change.y + (i - 1) * arrowSpacing;
+        
+        // Draw arrow
+        svg.append("path")
+            .attr("class", "comparison-arrow")
+            .attr("d", `M ${startX} ${arrowY} L ${endX} ${arrowY}`)
+            .attr("marker-end", "url(#arrowhead)");
+        
+        // Add change label with better formatting
+        const zoneShort = change.zone.split(' ')[0];
+        const changeText = `${change.position} - ${zoneShort}: ${(change.change * 100).toFixed(1)}%`;
+        
+        svg.append("text")
+            .attr("class", "arrow-label")
+            .attr("x", (startX + endX) / 2)
+            .attr("y", arrowY - 20)
+            .text(changeText)
+            .style("font-size", "12px");
+    });
+}
+
+/**
+ * Adds color legend to the visualization
+ */
+function addColorLegend(svg, colorScale, heatmapWidth, heatmapHeight) {
+    const legendWidth = 200;
+    const legendHeight = 20;
+    const legendX = heatmapWidth + 80 + heatmapWidth - legendWidth;
+    const legendY = heatmapHeight + 40;
+    
+    // Create gradient
+    const defs = svg.append("defs");
+    const gradient = defs.append("linearGradient")
+        .attr("id", "color-gradient");
+    
+    const domain = colorScale.domain();
+    const steps = 10;
+    for (let i = 0; i <= steps; i++) {
+        const value = domain[0] + (domain[1] - domain[0]) * (i / steps);
+        gradient.append("stop")
+            .attr("offset", `${(i / steps) * 100}%`)
+            .attr("stop-color", colorScale(value));
+    }
+    
+    // Draw legend rectangle
+    svg.append("rect")
+        .attr("x", legendX)
+        .attr("y", legendY)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .attr("fill", "url(#color-gradient)")
+        .attr("stroke", "#333")
+        .attr("stroke-width", 1);
+    
+    // Add legend labels
+    svg.append("text")
+        .attr("x", legendX)
+        .attr("y", legendY - 10)
+        .attr("class", "zone-label")
+        .text("Shot Percentage")
+        .style("font-size", "14px")
+        .style("font-weight", "bold");
+    
+    svg.append("text")
+        .attr("x", legendX)
+        .attr("y", legendY + legendHeight + 25)
+        .attr("class", "zone-label")
+        .text("0%")
+        .style("font-size", "12px");
+    
+    svg.append("text")
+        .attr("x", legendX + legendWidth)
+        .attr("y", legendY + legendHeight + 25)
+        .attr("class", "zone-label")
+        .text(`${(domain[1] * 100).toFixed(1)}%`)
+        .style("text-anchor", "end")
+        .style("font-size", "12px");
 }
 
 

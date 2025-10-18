@@ -130,10 +130,289 @@ h2 {
     padding: 1rem;
 }
 
+.introduction-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 .tick line { stroke: #e0e0e0; }
 .tick text { fill: #666; font-size: 12px; }
 .domain { stroke: #666; }
 
 footer {
     background-color: #1a1a1a !important;
+}
+
+/* Position Matrix Specific Styling */
+.position-matrix-section {
+    padding: 30px 20px;
+    background-color: #f8f9fa;
+    min-height: 80vh;
+}
+
+#position-matrix-chart {
+    width: 100%;
+    height: 70vh;
+    max-height: 600px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 20px;
+    overflow: hidden;
+}
+
+.heatmap-cell {
+    stroke: white;
+    stroke-width: 1;
+    cursor: pointer;
+    transition: stroke-width 0.2s ease;
+}
+
+.heatmap-cell:hover {
+    stroke: #1d428a;
+    stroke-width: 2;
+}
+
+.comparison-arrow {
+    stroke: #c8102e;
+    stroke-width: 3;
+    fill: none;
+    marker-end: url(#arrowhead);
+}
+
+.arrow-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    fill: #c8102e;
+    text-anchor: middle;
+}
+
+.season-title {
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    text-anchor: middle;
+    fill: #1a1a1a;
+}
+
+.position-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #333;
+}
+
+.zone-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    fill: #333;
+    text-anchor: middle;
+}
+
+.zone-label.rotated {
+    text-anchor: end;
+    dominant-baseline: middle;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.cell-percentage {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+/* Insights Placeholder Styling */
+.insights-placeholder {
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 30px;
+    margin: 20px 0;
+}
+
+.insights-placeholder h3 {
+    color: #1d428a;
+    margin-bottom: 20px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.insights-content ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.insights-content li {
+    margin-bottom: 8px;
+    color: #666;
+}
+
+/* Thank You Section */
+.thank-you-section {
+    padding: 80px 20px;
+    background-color: #1d428a; /* NBA Blue */
+    color: white;
+}
+
+.thank-you-section h2 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.team-member {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-5px);
+}
+
+.face-placeholder {
+    margin-bottom: 20px;
+}
+
+.face-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.face-image:hover {
+    transform: scale(1.05);
+}
+
+.team-member h4 {
+    color: white;
+    margin-bottom: 10px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.role {
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+/* Data Sources Section */
+.data-sources-section {
+    padding: 60px 20px;
+    background-color: #f8f9fa;
+}
+
+.data-sources-section h2 {
+    color: #1d428a;
+    margin-bottom: 20px;
+}
+
+.source-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.source-card:hover {
+    transform: translateY(-5px);
+}
+
+.source-card h4 {
+    color: #1d428a;
+    margin-bottom: 15px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.source-card p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.data-note {
+    color: #666;
+    font-size: 0.9rem;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #f26f21;
+}
+
+.source-placeholder {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 2px dashed #dee2e6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.source-placeholder h4 {
+    color: #1d428a;
+    margin-bottom: 15px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.source-placeholder p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.placeholder-content {
+    margin-top: 20px;
+}
+
+.placeholder-content ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.placeholder-content li {
+    color: #666;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.placeholder-content li:before {
+    content: "•";
+    color: #f26f21;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
 }
