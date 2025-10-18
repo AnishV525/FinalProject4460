@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Anton&display=swap');
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 70px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
+    background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+}
+
+h1, h2 {
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+h2 {
+    margin-bottom: 1rem;
+}
+
+.navbar {
+    background-color: #1a1a1a;
+    border-bottom: 3px solid #f26f21;
+    padding: 0.5rem 2rem;
+    font-size: 0.9rem;
+}
+
+.navbar-brand {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.8rem;
+    color: #fff !important;
+}
+
+.nav-link {
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-left: 15px;
+    position: relative;
+    transition: color 0.3s ease;
+    color: #fff;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 3px;
+    bottom: -8px;
+    left: 0;
+    background-color: #f26f21;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #f26f21 !important;
+}
+
+.nav-link:hover::after, .nav-link.active::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* --- Section Styling --- */
+.full-page-section, .vis-section {
+    padding: 100px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.full-page-section {
+    min-height: 100vh;
+}
+
+.vis-section {
+    min-height: 90vh;
+}
+
+#home {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop') no-repeat center center/cover;
+}
+
+.vis-container {
+    background: rgba(255, 255, 255, 0.98);
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.text-col p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.vis-note {
+    font-weight: bold;
+    color: #c8102e; /* NBA Red */
+    font-size: 1rem !important;
+}
+
+.interaction-row {
+    border-top: 2px dashed #e0e0e0;
+    padding-top: 2.5rem;
+    margin-top: 2.5rem;
+}
+
+.vis-placeholder-box {
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.vis-placeholder-text {
+    color: #6c757d;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+}
+
+.tick line { stroke: #e0e0e0; }
+.tick text { fill: #666; font-size: 12px; }
+.domain { stroke: #666; }
+
+footer {
+    background-color: #1a1a1a !important;
+}

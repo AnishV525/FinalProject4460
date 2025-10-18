@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="A D3 visualization of NBA shot data.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Evolution of the NBA Shot</title>
+    <!-- d3 -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+    <!-- Load CSS libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Anton&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#home">The NBA Shot</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#vis-shot-share">Shot Share</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#vis-court-heatmap">Hot Zones</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#vis-efficiency">Efficiency</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#vis-position-matrix">Player Roles</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content Sections -->
+<main>
+    <!-- HOME SECTION -->
+    <section id="home" class="full-page-section text-center text-light">
+        <div class="container">
+            <h1>The Evolution of the NBA Shot</h1>
+            <p class="lead">Exploring how shot selection, efficiency, and player roles have transformed the modern game.</p>
+            <p>A data visualization project by Anish Vallabhaneni, Harikesh Tambareni, Jonathan Liu, and Turan Cutler</p>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION 1: The 3-Point Revolution -->
+    <section id="vis-shot-share" class="vis-section">
+        <div class="container vis-container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>The 3-Point Revolution</h2>
+                    <p>Our story begins with the most significant change in basketball strategy in a generation. This chart compares shot distribution in 2014 versus 2024. Notice the dramatic decline of the mid-range shot and the explosive growth of the 3-pointer, setting the stage for a new era of basketball.</p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="shot-share-chart" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 1: Grouped Bar Chart] will be rendered here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION 2: The Hot Zones (Advanced Vis) -->
+    <section id="vis-court-heatmap" class="vis-section">
+        <div class="container vis-container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>Where are the Hot Zones?</h2>
+                    <p>This interactive heatmap visualizes shot density across the court. Use the toggle to see how the geography of the game has shifted. In 2014, shots were more evenly spread. By 2024, a distinct "donut hole" appears in the mid-range, with shots clustering at the rim and behind the arc.</p>
+                    <p class="vis-note"><strong>(Innovative Visualization)</strong></p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="court-heatmap-chart" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 2: Interactive Court Heatmap] will be rendered here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION 3 & 4: Linked Interaction -->
+    <section id="vis-efficiency" class="vis-section">
+        <div class="container vis-container">
+            <!-- Part 1: Scatter Plot -->
+            <div class="row align-items-center mb-5">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>Efficiency vs. Volume</h2>
+                    <p>Does taking more shots make you a better player? This scatter plot charts player efficiency (Field Goal %) against their shot volume. We can see that being a high-volume "star" doesn't automatically mean you're an efficient scorer. This leads to our next question: what makes a player efficient?</p>
+                    <p class="vis-note"><strong>(Linked Interaction Part 1)</strong></p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="efficiency-scatter-plot" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 3: Scatter Plot with Brushing] will be rendered here.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Part 2: Linked Bar Chart -->
+            <div class="row align-items-center interaction-row">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>Player Shot Profiles</h2>
+                    <p>This chart reveals the shot selection for individual players. It's linked to the scatter plot above.</p>
+                    <p><strong>To use the interaction:</strong> Click and drag on the scatter plot to select a group of players. Their shot profiles will appear here, revealing the *why* behind their efficiency.</p>
+                    <p class="vis-note"><strong>(Linked Interaction Part 2)</strong></p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="player-profile-chart" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 4: Linked Stacked Bar Chart] updates based on brushing Vis 3.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION 5: Position Matrix -->
+    <section id="vis-position-matrix" class="vis-section">
+        <div class="container vis-container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>What's My Role?</h2>
+                    <p>Efficiency isn't just about individual skill; it's about playing your role. This matrix shows the shot diet for each position. It's clear that Guards, Forwards, and Centers have fundamentally different jobs on the court, specializing in different zones to maximize offensive output for the team.</p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="position-matrix-chart" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 5: Position Shot Matrix Heatmap] will be rendered here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="row">
+    <div class="col text-center text-light p-3">
+        <p class="mb-0">Data Source: NBA Stats API</p>
+    </div>
+</footer>
+
+<!-- embedding JS libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+<!-- own js files -->
+<script src="js/main.js"></script>
+</body>
+</html>
