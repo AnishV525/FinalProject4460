@@ -416,3 +416,13 @@ footer {
     position: absolute;
     left: 0;
 }
+
+#court-heatmap-chart {
+    background: rgba(0,0,0,0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 360px;
+}
+.court-bubble-svg {
+    border-radius: 12px;
+}

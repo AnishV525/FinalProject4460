@@ -171,11 +171,196 @@ function createShotShareChart(data2014, data2024) {
  * @param {Array} data2024 - The raw shot data from 2024.
  */
 function createCourtHeatmap(data2014, data2024) {
-    console.log("Vis 2: Interactive Court Heatmap function called.");
-    // 1. Draw an SVG basketball court.
-    // 2. Use a library like d3-hexbin to create density plots.
-    // 3. Add a toggle/button to switch the data source between 2014 and 2024.
+    const container = d3.select("#court-heatmap-chart");
+    container.html("").style("position", "relative");
+
+    const controls = container.append("div")
+        .style("position", "absolute").style("top", "8px").style("right", "8px").style("z-index", 2)
+        .style("display", "flex").style("gap", "8px").style("align-items", "center");
+
+    const btnGroup = controls.append("div").attr("class", "btn-group btn-group-sm");
+    const filterButtons = [
+        { key: "ALL", label: "All" },
+        { key: "3PT", label: "3PT" },
+        { key: "2PT", label: "2PT" }
+    ];
+    let shotFilter = "3PT"; // defaulted to 2pt, but can be changed, i think it makes for sense as 3pt for now
+
+    filterButtons.forEach(b =>
+        btnGroup.append("button")
+            .attr("type", "button")
+            .attr("class", `btn btn-${b.key === shotFilter ? "light" : "outline-light"}`)
+            .text(b.label)
+            .on("click", function () {
+                shotFilter = b.key;
+                btnGroup.selectAll("button")
+                    .attr("class", d => `btn btn-${(d3.select(this).text() === b.label) ? "light" : "outline-light"}`);
+                render();
+            })
+    );
+
+    const toggleBtn = controls.append("button")
+        .attr("type", "button").attr("class", "btn btn-sm btn-outline-light")
+        .text("Switch to 2014");
+
+    const titleEl = container.append("div")
+        .style("position", "absolute").style("left", "12px").style("top", "8px").style("z-index", 2)
+        .style("font-weight", "700").style("letter-spacing", "0.3px").style("color", "white");
+
+    const svg = container.append("svg")
+        .attr("class", "court-bubble-svg")
+        .style("display", "block").style("width", "100%").style("height", "100%");
+
+    const g = svg.append("g");
+    const bubbleLayer = g.append("g").attr("class", "bubbles");
+    // dont switch these, courtLayer must be above bubbleLayer or else we wont see the courtLayer
+    const courtLayer  = g.append("g").attr("class", "court");
+
+    // remove overflow
+    const clip = svg.append("defs").append("clipPath").attr("id", "court-clip").append("rect");
+    bubbleLayer.attr("clip-path", "url(#court-clip)");
+
+    const courtX = [-25, 25];
+    const courtY = [0, 47];
+    const color = d3.scaleSequential(d3.interpolateOrRd);
+
+    function drawCourt(x, y) {
+        courtLayer.selectAll("*").remove();
+        const stroke = "rgba(255,255,255,0.85)";
+        const line = (sel) => sel.attr("fill", "none").attr("stroke", stroke).attr("stroke-width", 1.5);
+        courtLayer.append("rect")
+            .call(line)
+            .attr("x", x(courtX[0])).attr("y", y(courtY[1]))
+            .attr("width", x(courtX[1]) - x(courtX[0]))
+            .attr("height", y(courtY[0]) - y(courtY[1]));
+
+        // Paint
+        courtLayer.append("rect")
+            .call(line).attr("x", x(-8)).attr("y", y(19))
+            .attr("width", x(8) - x(-8)).attr("height", y(0) - y(19));
+
+        // Rim
+        courtLayer.append("circle")
+            .call(line).attr("cx", x(0)).attr("cy", y(4.75))
+            .attr("r", Math.max(1, (x(1.5) - x(0))));
+
+        // Free throw circle
+        courtLayer.append("circle")
+            .call(line).attr("cx", x(0)).attr("cy", y(19)).attr("r", Math.abs(x(6) - x(0)));
+
+        // 3pt arc + corners
+        const arcR = Math.abs(x(23.75) - x(0));
+        const arc = d3.arc().innerRadius(arcR).outerRadius(arcR)
+            .startAngle(-Math.PI * 0.83).endAngle(Math.PI * 0.83);
+        courtLayer.append("path").call(line)
+            .attr("transform", `translate(${x(0)},${y(4.75)})`).attr("d", arc());
+        courtLayer.append("line").call(line).attr("x1", x(-22)).attr("y1", y(0)).attr("x2", x(-22)).attr("y2", y(14));
+        courtLayer.append("line").call(line).attr("x1", x(22)).attr("y1", y(0)).attr("x2", x(22)).attr("y2", y(14));
+    }
+
+    function filterRows(rows) {
+        return rows.filter(r => {
+            const type = (r.SHOT_TYPE || "").toUpperCase();
+            const zone = (r.BASIC_ZONE || "");
+            const is3 =
+                type.includes("3PT") ||
+                zone === "Above the Break 3" || zone === "Left Corner 3" || zone === "Right Corner 3";
+            if (shotFilter === "3PT") return is3;
+            if (shotFilter === "2PT") return !is3;
+            return true;
+        });
+    }
+
+    function gridAggregate(rows, cellFeet, xScale, yScale) {
+        const key = (gx, gy) => `${gx},${gy}`;
+        const map = new Map();
+        for (const r of rows) {
+            const x = +r.LOC_X, y = +r.LOC_Y;
+            if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+            const gx = Math.round(x / cellFeet) * cellFeet;
+            const gy = Math.round(y / cellFeet) * cellFeet;
+            const k = key(gx, gy);
+            const o = map.get(k) || { gx, gy, count: 0 };
+            o.count += 1;
+            map.set(k, o);
+        }
+        const arr = Array.from(map.values()).map(d => ({ ...d, sx: xScale(d.gx), sy: yScale(d.gy) }));
+        arr.sort((a, b) => b.count - a.count);
+        return arr;
+    }
+
+    let currentSeason = "2024"; // again, default to 2024, i think it makes most sense
+
+    function render() {
+        const box = container.node().getBoundingClientRect();
+        const pad = 16;
+        const W = Math.max(320, box.width) - pad * 2;
+        const H = Math.max(260, box.height) - pad * 2;
+
+        svg.attr("viewBox", `0 0 ${W + pad * 2} ${H + pad * 2}`);
+        g.attr("transform", `translate(${pad},${pad})`);
+
+        const aspect = (courtX[1] - courtX[0]) / (courtY[1] - courtY[0]);
+        let drawW = W, drawH = H;
+        if (W / H > aspect) drawW = H * aspect; else drawH = W / aspect;
+        const left = (W - drawW) / 2, top = (H - drawH) / 2;
+
+        const x = d3.scaleLinear().domain(courtX).range([left, left + drawW]);
+        const y = d3.scaleLinear().domain(courtY).range([top + drawH, top]);
+        clip.attr("x", left).attr("y", top).attr("width", drawW).attr("height", drawH);
+
+        const rows2014 = filterRows(data2014);
+        const rows2024 = filterRows(data2024);
+
+        const cellFeet = 1.4;
+        const agg2014 = gridAggregate(rows2014, cellFeet, x, y);
+        const agg2024 = gridAggregate(rows2024, cellFeet, x, y);
+        const p95_2014 = d3.quantile(agg2014.map(d => d.count).sort(d3.ascending), 0.95) || 1;
+        const p95_2024 = d3.quantile(agg2024.map(d => d.count).sort(d3.ascending), 0.95) || 1;
+        const cap = Math.max(1, p95_2014, p95_2024);
+
+        color.domain([1, cap]);
+        const rMax = Math.min(drawW, drawH) / 24;
+        const r = d3.scaleSqrt().domain([1, cap]).range([2, rMax]);
+        const alpha = d3.scaleLinear().domain([1, cap]).range([0.25, 0.9]).clamp(true);
+
+        const agg = (currentSeason === "2014") ? agg2014 : agg2024;
+
+        const circles = bubbleLayer.selectAll("circle.bubble").data(agg, d => `${d.gx},${d.gy}`);
+        circles.join(
+            enter => enter.append("circle")
+                .attr("class", "bubble")
+                .attr("cx", d => d.sx).attr("cy", d => d.sy)
+                .attr("r", 0).attr("fill", d => color(Math.min(d.count, cap)))
+                .attr("stroke", "none").attr("opacity", 0)
+                .transition().duration(250)
+                .attr("r", d => r(Math.min(d.count, cap)))
+                .attr("opacity", d => alpha(Math.min(d.count, cap))),
+            update => update.transition().duration(200)
+                .attr("cx", d => d.sx).attr("cy", d => d.sy)
+                .attr("r", d => r(Math.min(d.count, cap)))
+                .attr("fill", d => color(Math.min(d.count, cap)))
+                .attr("opacity", d => alpha(Math.min(d.count, cap))),
+            exit => exit.transition().duration(150).attr("opacity", 0).attr("r", 0).remove()
+        );
+
+        drawCourt(x, y);
+        courtLayer.raise();
+
+        titleEl.text(`Shot Density (Bubbles) — ${currentSeason} — ${shotFilter}`);
+        toggleBtn.text(currentSeason === "2014" ? "Switch to 2024" : "Switch to 2014");
+    }
+
+    toggleBtn.on("click", () => {
+        currentSeason = currentSeason === "2014" ? "2024" : "2014";
+        render();
+    });
+
+    const ro = new ResizeObserver(() => render());
+    ro.observe(container.node());
+    render();
 }
+
 
 // Helper to map a playerName --> player stats, full return:
 // Map(playerName -> { player, threePA_pg, threePA_total, threePM, threePCT, corner3A, aboveBreakA })
