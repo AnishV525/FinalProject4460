@@ -36,13 +36,10 @@
                     <a class="nav-link" href="#introduction">Introduction</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#data-introduction">Will Figure out additional context to add</a>
+                    <a class="nav-link" href="#data-introduction">Mid-Range Shots</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#vis-shot-share">Shot Share</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#vis-court-heatmap">Hot Zones</a>
+                    <a class="nav-link" href="#vis-shot-share">3-Point Revolution</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#vis-efficiency">Efficiency</a>
@@ -51,7 +48,7 @@
                     <a class="nav-link" href="#vis-position-matrix">Player Roles</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#closing-thoughts">Conclusion</a>
+                    <a class="nav-link" href="#closing-thoughts">Closing Thoughts</a>
                 </li>
             </ul>
         </div>
@@ -64,8 +61,19 @@
     <section id="home" class="full-page-section text-center text-light">
         <div class="container">
             <h1>The Evolution of the NBA Shot</h1>
-            <p class="lead">Exploring how shot selection, efficiency, and player roles have transformed the modern game.</p>
+            <p class="lead">Exploring how one key facet of the National Basketball Association has transformed the modern game.</p>
             <p>A data visualization project by Anish Vallabhaneni, Harikesh Tambareni, Jonathan Le, and Turan Celik</p>
+        </div>
+    </section>
+
+    <!-- PREFACE SECTION -->
+    <section id="preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">Ten years ago, the NBA looked completely different. It used to be much more physical and diverse... Let's see how.</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -76,12 +84,23 @@
                 <div class="col-12 col-md-4 text-col">
                     <h2>NBA Introduction</h2>
                     <p>The National Basketball Association has undergone a dramatic transformation over the past decade. From strategic shifts in coaching philosophy to revolutionary changes in player development, the game we watch today is fundamentally different from what it was just ten years ago.</p>
-                    <p>This visualization explores one of the most significant changes in modern basketball: the evolution of shot selection and player positioning. We'll examine how teams have adapted their strategies and how players have refined their roles to maximize offensive efficiency.</p>
+                    <p>We noticed that the most significant changes in modern basketball comes from ONE place: the evolution of <strong>shot selection</strong>.</p>
                 </div>
                 <div class="col-12 col-md-8">
                     <div id="introduction-chart" class="vis-placeholder-box">
                         <img src="nba-kids-games.png" alt="NBA Arena" class="introduction-image">
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHOT DECISION PREFACE -->
+    <section id="shot-decision-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">When a basketball player receives the ball and wants to take a shot, they are deciding where the best location to take it is. Over 10 years from 2014-2024, these <strong>"shot selection"</strong> patterns started to change.</div>
                 </div>
             </div>
         </div>
@@ -93,12 +112,23 @@
             <div class="row align-items-center">
                 <div class="col-12 col-md-4 text-col">
                     <h2>Mid-Range Shots Are Disappearing</h2>
-                    <p> For a long time, the mid-range jumper was how you scored in the NBA. In 2013–14, about 27% of all field goal attempts in the league were mid-range twos. Ten years later, that number is almost cut in half, down near 11%. Teams figured out that those shots are the worst of both worlds: they’re worth only two points, but they’re not as easy or as efficient as a layup. At the same time, threes exploded and paint shots stayed valuable. So the mid-range didn’t just “get worse.”. The geometry of the game changed because the math made it impossible to justify that shot at scale. </p>
+                    <p>For a long time, the mid-range jumper was how you scored in the NBA. In 2013–14, about 27% of all field goal attempts in the league were mid-range twos. Ten years later, that number is almost cut in half, down near 11%. Teams figured out that those shots are the worst of both worlds: they're worth only two points, but they're not as easy or as efficient as a layup. At the same time, threes exploded and paint shots stayed valuable. So the mid-range didn't just "get worse." The geometry of the game changed because the math made it impossible to justify that shot at scale.</p>
                 </div>
                 <div class="col-12 col-md-8">
                     <div id="data-intro-chart" class="vis-placeholder-box">
                         <p class="vis-placeholder-text">xx</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREFACE BETWEEN MID-RANGE AND 3-POINT REVOLUTION -->
+    <section id="mid-range-to-three-point-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">As the mid-range disappeared, something else exploded in its place.</div>
                 </div>
             </div>
         </div>
@@ -121,19 +151,12 @@
         </div>
     </section>
 
-    <!-- VISUALIZATION 2: The Hot Zones (Advanced Vis) -->
-    <section id="vis-court-heatmap" class="vis-section">
-        <div class="container vis-container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-4 text-col">
-                    <h2>Where are the Hot Zones?</h2>
-                    <p>This interactive heatmap visualizes shot density across the court. Use the toggle to see how the geography of the game has shifted. In 2014, shots were more evenly spread. By 2024, a distinct "donut hole" appears in the mid-range, with shots clustering at the rim and behind the arc.</p>
-                    <p class="vis-note"><strong>(Innovative Visualization)</strong></p>
-                </div>
-                <div class="col-12 col-md-8">
-                    <div id="court-heatmap-chart" class="vis-placeholder-box">
-                        <p class="vis-placeholder-text">[Vis 2: Interactive Court Heatmap] will be rendered here.</p>
-                    </div>
+    <!-- 3-POINT EFFICIENCY PREFACE -->
+    <section id="three-point-efficiency-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">It's now obvious that 3-point shots rule the game in 2024 and players like Steph Curry who can master it can win games. Let's look deeper into the 3-point shot and see the effects of this revolution.</div>
                 </div>
             </div>
         </div>
@@ -145,9 +168,10 @@
             <!-- Part 1: Scatter Plot -->
             <div class="row align-items-center mb-5">
                 <div class="col-12 col-md-4 text-col">
-                    <h2>Efficiency vs. Volume</h2>
-                    <p>Does taking more shots make you a better player? This scatter plot charts player efficiency (Field Goal %) against their shot volume. We can see that being a high-volume "star" doesn't automatically mean you're an efficient scorer. This leads to our next question: what makes a player efficient?</p>
-                    <p class="vis-note"><strong>(Linked Interaction Part 1)</strong></p>
+                    <h2>Definition of Efficiency</h2>
+                    <p>Efficiency has always mattered in basketball, but how it's achieved has changed from 2014 to 2024 because the 3-point shot is prioritized.</p>
+                    <p>In the past, efficient scorers focused on taking high-percentage shots near the rim or balanced mid-range jumpers. In today's NBA, efficiency is defined by shot value... trading twos for threes and maximizing points per attempt.</p>
+                    <p>The best adapt by finding a balance between volume and value, redefining what it means to score efficiently in the modern game.</p>
                 </div>
                 <div class="col-12 col-md-8">
                     <div id="efficiency-scatter-plot" class="vis-placeholder-box">
@@ -158,10 +182,9 @@
             <!-- Part 2: Linked Bar Chart -->
             <div class="row align-items-center interaction-row">
                 <div class="col-12 col-md-4 text-col">
-                    <h2>Player Shot Profiles</h2>
-                    <p>This chart reveals the shot selection for individual players. It's linked to the scatter plot above.</p>
-                    <p><strong>To use the interaction:</strong> Click and drag on the scatter plot to select a group of players. Their shot profiles will appear here, revealing the *why* behind their efficiency.</p>
-                    <p class="vis-note"><strong>(Linked Interaction Part 2)</strong></p>
+                    <h2>3-Point Shot Preferences</h2>
+                    <p><strong>Linked to the scatter plot above</strong>, it lets us see where the highlighted players concentrate their attempts in high-value shots: corner threes and above-the-break threes.</p>
+                    <p>We can double click to see how players with higher and lower efficiency/volume are taking their shots. Just another tool to think deeper into the 3 point shot.</p>
                 </div>
                 <div class="col-12 col-md-8">
                     <div id="player-profile-chart" class="vis-placeholder-box">
@@ -172,28 +195,53 @@
         </div>
     </section>
 
-    <!-- VISUALIZATION 5: Position Matrix -->
-    <section id="vis-position-matrix" class="position-matrix-section">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 text-center mb-4">
+    <!-- ROLE TRANSITION PREFACE -->
+    <section id="role-transition-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">We looked at the transition of shot locations (paint, mid-range, 3-pointers) and the impact of that on modern-day efficiency. Now, let's dive into how different roles were effected by this same transition.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUALIZATION 5 & 6: Position Matrix -->
+    <section id="vis-position-matrix" class="vis-section">
+        <div class="container vis-container">
+            <!-- Part 1: 2014 Heatmap -->
+            <div class="row align-items-center mb-5">
+                <div class="col-12 col-md-4 text-col">
                     <h2>What's My Role?</h2>
-                    <p class="lead">Efficiency isn't just about individual skill; it's about playing your role. This matrix shows the shot diet for each position. It's clear that Guards, Forwards, and Centers have fundamentally different jobs on the court, specializing in different zones to maximize offensive output for the team.</p>
+                    <p>Efficiency isn't just about individual skill; it's about playing your role. This matrix shows the shot diet for each position. It's clear that Guards, Forwards, and Centers have fundamentally different jobs on the court, specializing in different zones to maximize offensive output for the team.</p>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div id="position-matrix-chart"></div>
-                </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="insights-placeholder">
-                        <h3>Key Insights from the Position Matrix</h3>
-                        <div class="insights-content">
-                            <p>Between 2014 and 2024, NBA shot distribution evolved dramatically across all positions. Guards shifted away from mid-range shots (−14%) toward three-pointers, especially above-the-break attempts (+9%), reflecting the rise of perimeter-focused offenses. Forwards showed a similar transformation, reducing mid-range attempts (−16%) while increasing both paint and corner-three efficiency. Centers maintained high restricted-area usage (~48%) but nearly abandoned mid-range looks (−17%), adopting more three-point attempts, signaling the growth of the “stretch five.” Overall, the decade marks a clear league wide emphasis on spacing, efficiency, and high-value shot zones. </p>
-                        </div>
+                <div class="col-12 col-md-8">
+                    <div id="position-matrix-chart-2014" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 5: Position Matrix Heatmap 2014] will be rendered here.</p>
                     </div>
+                </div>
+            </div>
+            <!-- Part 2: 2024 Heatmap -->
+            <div class="row align-items-center interaction-row">
+                <div class="col-12 col-md-4 text-col">
+                    <h2>How Roles Changed</h2>
+                    <p>Between 2014 and 2024, NBA shot distribution evolved dramatically across all positions. Guards shifted away from mid-range shots (−14%) toward three-pointers, especially above-the-break attempts (+9%), reflecting the rise of perimeter-focused offenses. Forwards showed a similar transformation, reducing mid-range attempts (−16%) while increasing both paint and corner-three efficiency. Centers maintained high restricted-area usage (~48%) but nearly abandoned mid-range looks (−17%), adopting more three-point attempts, signaling the growth of the "stretch five." Overall, the transition of shot selection to gain maximum efficiency within each of the roles is clear as day.</p>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div id="position-matrix-chart-2024" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 6: Position Matrix Heatmap 2024] will be rendered here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLOSING THOUGHTS PREFACE -->
+    <section id="closing-thoughts-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">Shot selection encompassed many factors such as location, value, efficiency, and role. Let's package everything together and preview this heatmap showing the dramatic change in the game.</div>
                 </div>
             </div>
         </div>
@@ -210,8 +258,8 @@
                     <p>As we look to the future, one thing is certain: the NBA will continue to evolve. The question isn't whether change will come, but what the next revolution will look like.</p>
                 </div>
                 <div class="col-12 col-md-8">
-                    <div id="closing-thoughts-chart" class="vis-placeholder-box">
-                        <p class="vis-placeholder-text">[Closing Thoughts Visualization] will be rendered here.</p>
+                    <div id="court-heatmap-chart" class="vis-placeholder-box">
+                        <p class="vis-placeholder-text">[Vis 2: Interactive Court Heatmap] will be rendered here.</p>
                     </div>
                 </div>
             </div>
@@ -232,33 +280,21 @@
         <div class="row justify-content-center">
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="team-member">
-                    <div class="face-placeholder">
-                        <img src="https://via.placeholder.com/200x200/1d428a/ffffff?text=Anish" alt="Anish Vallabhaneni" class="face-image">
-                    </div>
                     <h4>Anish Vallabhaneni</h4>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="team-member">
-                    <div class="face-placeholder">
-                        <img src="https://via.placeholder.com/200x200/c8102e/ffffff?text=Harikesh" alt="Harikesh Tambareni" class="face-image">
-                    </div>
                     <h4>Harikesh Tambareni</h4>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="team-member">
-                    <div class="face-placeholder">
-                        <img src="https://via.placeholder.com/200x200/f26f21/ffffff?text=Jonathan" alt="Jonathan Le" class="face-image">
-                    </div>
                     <h4>Jonathan Le</h4>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="team-member">
-                    <div class="face-placeholder">
-                        <img src="https://via.placeholder.com/200x200/1d428a/ffffff?text=Turan" alt="Turan Celik" class="face-image">
-                    </div>
                     <h4>Turan Celik</h4>
                 </div>
             </div>
@@ -273,14 +309,11 @@
             <div class="col-12 text-center">
                 <div class="source-placeholder">
                     <h4>Data Sources</h4>
-                    <p>Data sources and references will be added here</p>
                     <div class="placeholder-content">
-                        <p><em>This section will contain:</em></p>
-                        <ul>
-                            <li>Primary data sources</li>
-                            <li>Methodology references</li>
-                            <li>Additional resources</li>
-                        </ul>
+                        <p><strong>NBA Shots Dataset</strong></p>
+                        <p>Our primary dataset for this visualization was obtained from Kaggle:</p>
+                        <p><a href="https://www.kaggle.com/datasets/mexwell/nba-shots?resource=download" target="_blank" rel="noopener noreferrer">https://www.kaggle.com/datasets/mexwell/nba-shots?resource=download</a></p>
+                        <p>This dataset contains comprehensive shot location and statistics data for NBA seasons, including shot coordinates, shot types, player positions, and temporal information spanning from 2014 to 2024.</p>
                     </div>
                 </div>
             </div>
