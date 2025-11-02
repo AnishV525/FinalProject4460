@@ -921,6 +921,337 @@ function addComparisonArrows(svg, matrix2014, matrix2024, xScale, yScale, heatma
     });
 }
 
+function renderMidrangeSlope() {
+    Promise.all([
+        d3.csv("data/NBA_2014_Shots.csv", d3.autoType),
+        d3.csv("data/NBA_2024_Shots.csv", d3.autoType)
+    ]).then(([data14, data24]) => {
+
+        function midrangePct(data) {
+            const total = data.length;
+            const mid = data.filter(d => d.BASIC_ZONE === "Mid-Range").length;
+            return (mid / total) * 100;
+        }
+
+        const pct14 = midrangePct(data14); // ~27%
+        const pct24 = midrangePct(data24); // ~11%
+
+        const stats = [
+            { season: "2014", value: pct14 },
+            { season: "2024", value: pct24 }
+        ];
+
+        const containerSel = d3.select("#data-intro-chart");
+        const boxNode = containerSel.node();
+        const boxWidth = boxNode.clientWidth;
+        const boxHeight = boxNode.clientHeight; 
+
+        const margin = { top: 60, right: 80, bottom: 60, left: 80 };
+        const innerWidth = boxWidth - margin.left - margin.right;
+        const innerHeight = boxHeight - margin.top - margin.bottom;
+
+        const x = d3.scalePoint()
+            .domain(stats.map(d => d.season))
+            .range([0, innerWidth])
+            .padding(0.5);
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(stats, d => d.value)]).nice()
+            .range([innerHeight, 0]);
+
+        containerSel.html("");
+
+        const svg = containerSel
+            .append("svg")
+            .attr("width", boxWidth)
+            .attr("height", boxHeight)
+            .attr("class", "midrange-slope-chart");
+
+        const g = svg.append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        g.append("g")
+            .attr("class", "gridlines")
+            .call(
+                d3.axisLeft(y)
+                  .ticks(4)
+                  .tickSize(-innerWidth)
+                  .tickFormat("")
+            )
+            .call(grid => grid.selectAll("line")
+                .attr("stroke", "#dee2e6")
+                .attr("stroke-dasharray", "2,2")
+            )
+            .call(grid => grid.select(".domain").remove());
+
+        g.append("line")
+            .attr("x1", x("2014"))
+            .attr("y1", y(pct14))
+            .attr("x2", x("2024"))
+            .attr("y2", y(pct24))
+            .attr("stroke", "#c8102e")       
+            .attr("stroke-width", 4)
+            .attr("stroke-linecap", "round");
+
+        g.selectAll("circle.point")
+            .data(stats)
+            .join("circle")
+            .attr("class", "point")
+            .attr("cx", d => x(d.season))
+            .attr("cy", d => y(d.value))
+            .attr("r", 8)
+            .attr("fill", "#c8102e")
+            .attr("stroke", "white")
+            .attr("stroke-width", 2);
+
+        g.selectAll("text.pct-label")
+            .data(stats)
+            .join("text")
+            .attr("class", "pct-label")
+            .attr("x", d => {
+                if (d.season === "2024") return x(d.season) + 20; 
+                    else return x(d.season); 
+    })
+            .attr("y", d => y(d.value) - 20) 
+            .attr("text-anchor", "middle")
+            .style("font-family", "Anton, sans-serif")
+            .style("font-size", "32px")
+            .style("fill", "#c8102e")
+            .text(d => d.value.toFixed(1) + "%");
+
+
+        g.selectAll("text.season-label")
+            .data(stats)
+            .join("text")
+            .attr("class", "season-label")
+            .attr("x", d => x(d.season))
+            .attr("y", d => y(d.value) + 28)
+            .attr("text-anchor", "middle")
+            .style("font-family", "Anton, sans-serif")
+            .style("font-size", "20px")
+            .style("fill", "#1a1a1a")
+            .text(d => d.season);
+
+        const yAxis = d3.axisLeft(y)
+            .ticks(4)
+            .tickFormat(d => d + "%");
+
+        g.append("g")
+            .attr("transform", `translate(${-40},0)`)
+            .call(yAxis)
+            .call(axis => axis.selectAll("text")
+                .style("font-size", "13px")
+                .style("font-family", "Roboto, sans-serif")
+                .style("fill", "#6c757d")
+            )
+            .call(axis => axis.selectAll("line")
+                .attr("stroke", "#dee2e6")
+            )
+            .call(axis => axis.select(".domain").remove());
+
+svg.append("text")
+    .attr("x", boxWidth / 2)
+    .attr("y", boxHeight - 30)
+    .attr("text-anchor", "middle")
+    .style("font-family", "Roboto, sans-serif")
+    .style("font-size", "12px")
+    .style("fill", "#6c757d")
+    .text("Mid-range usage collapsed from ~27% of all shots to ~11% in 10 years.");
+
+svg.append("text")
+    .attr("x", boxWidth / 2)
+    .attr("y", boxHeight - 15)
+    .attr("text-anchor", "middle")
+    .style("font-family", "Roboto, sans-serif")
+    .style("font-size", "12px")
+    .style("fill", "#6c757d")
+    .text("Each point shows the share of total field goal attempts taken from the mid-range.");
+
+
+    });
+}
+
+renderMidrangeSlope();
+
+function renderClosingSummary() {
+    const containerSel = d3.select("#closing-thoughts-chart");
+    containerSel.html("");
+
+    const node = containerSel.node();
+    const boxWidth = node.clientWidth;
+    const boxHeight = node.clientHeight; 
+
+    const svg = containerSel
+        .append("svg")
+        .attr("width", boxWidth)
+        .attr("height", boxHeight)
+        .attr("class", "closing-era-comparison");
+
+    const margin = { top: 40, right: 40, bottom: 60, left: 40 };
+    const innerWidth = boxWidth - margin.left - margin.right;
+    const innerHeight = boxHeight - margin.top - margin.bottom;
+
+    const leftCenterX  = margin.left + innerWidth * 0.28;
+    const rightCenterX = margin.left + innerWidth * 0.72;
+    const centerY      = margin.top + innerHeight * 0.55;
+
+    const leftRimR        = 35;
+    const leftMidR        = 80;
+    const leftThreeR      = 120;
+
+    const rightRimR       = 40;
+    const rightMidR       = 55;
+    const rightThreeR     = 120;
+
+    const rimColor    = "#c8102e";  // red
+    const midColor    = "#f4a261";  // orange 
+    const threeColor  = "#ffce1cff";  
+    const neutralFill     = "#d9d9d9";  
+    const textDark        = "#1a1a1a";
+    const textGray        = "#6c757d";
+    const accentBlue      = "#000000ff";
+
+    function softCircle(g, cx, cy, r, fill, fillOpacity, stroke, strokeOpacity) {
+        g.append("circle")
+            .attr("cx", cx)
+            .attr("cy", cy)
+            .attr("r", r)
+            .attr("fill", fill)
+            .attr("fill-opacity", fillOpacity)
+            .attr("stroke", stroke || fill)
+            .attr("stroke-width", 2)
+            .attr("stroke-opacity", strokeOpacity != null ? strokeOpacity : fillOpacity * 0.6);
+    }
+
+    const leftGroup = svg.append("g").attr("class", "era-left");
+
+    // LEFT ERA 
+softCircle(leftGroup, leftCenterX, centerY, leftThreeR, threeColor, 0.25, threeColor, 0.3); // yellow outer ring
+softCircle(leftGroup, leftCenterX, centerY, leftMidR, midColor, 0.3, midColor, 0.4);       // orange mid ring
+softCircle(leftGroup, leftCenterX, centerY, leftRimR, rimColor, 0.35, rimColor, 0.6);      // red inner circle
+
+
+    leftGroup.append("text")
+        .attr("x", leftCenterX)
+        .attr("y", centerY - leftThreeR - 30)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Anton, sans-serif")
+        .style("font-size", "20px")
+        .style("fill", textDark)
+        .text("Early 2010s (~2014)");
+
+    leftGroup.append("text")
+        .attr("x", leftCenterX)
+        .attr("y", centerY - leftThreeR - 8)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Roboto, sans-serif")
+        .style("font-size", "13px")
+        .style("fill", accentBlue)
+        .text("Mid-range volume high");
+
+    // RIGHT ERA 
+    const rightGroup = svg.append("g").attr("class", "era-right");
+
+softCircle(rightGroup, rightCenterX, centerY, rightThreeR, threeColor, 0.25, threeColor, 0.3);
+softCircle(rightGroup, rightCenterX, centerY, rightMidR, midColor, 0.3, midColor, 0.4);
+softCircle(rightGroup, rightCenterX, centerY, rightRimR, rimColor, 0.35, rimColor, 0.6);
+
+
+    rightGroup.append("text")
+        .attr("x", rightCenterX)
+        .attr("y", centerY - rightThreeR - 30)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Anton, sans-serif")
+        .style("font-size", "20px")
+        .style("fill", textDark)
+        .text("Modern Era (~2024)");
+
+    rightGroup.append("text")
+        .attr("x", rightCenterX)
+        .attr("y", centerY - rightThreeR - 8)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Roboto, sans-serif")
+        .style("font-size", "13px")
+        .style("fill", accentBlue)
+        .text("Rim + 3s dominate");
+
+    const arrowGroup = svg.append("g").attr("class", "arrow-group");
+
+    const arrowX1 = (leftCenterX + rightCenterX) / 2 - 30;
+    const arrowX2 = (leftCenterX + rightCenterX) / 2 + 30;
+    const arrowY  = centerY;
+
+    arrowGroup.append("line")
+        .attr("x1", arrowX1)
+        .attr("y1", arrowY)
+        .attr("x2", arrowX2)
+        .attr("y2", arrowY)
+        .attr("stroke", accentBlue)
+        .attr("stroke-width", 3)
+        .attr("stroke-linecap", "round");
+
+    arrowGroup.append("path")
+        .attr("d", `M ${arrowX2-10} ${arrowY-6} L ${arrowX2} ${arrowY} L ${arrowX2-10} ${arrowY+6} Z`)
+        .attr("fill", accentBlue)
+        .attr("stroke", "none");
+
+   
+    const legendY = boxHeight - margin.bottom + 20;
+    const legendGroup = svg.append("g")
+        .attr("class", "legend-group")
+        .attr("transform", `translate(${boxWidth/2 - 20},${legendY})`);
+
+    const legendItems = [
+        {
+            label: "At the Rim (High Value)",
+            color: rimColor,
+            fillOpacity: 0.35,
+            stroke: rimColor
+        },
+        {
+            label: "Mid-Range (Low Volume)",
+            color: midColor,
+            fillOpacity: 0.8,
+            stroke: midColor
+        },
+        {
+            label: "Three-Point (High Volume)",
+            color: threeColor,
+            fillOpacity: 0.12,
+            stroke: threeColor
+        }
+    ];
+
+    const legendSpacing = 220;
+
+    const eachLegend = legendGroup.selectAll("g.legend-item")
+        .data(legendItems)
+        .join("g")
+        .attr("class", "legend-item")
+        .attr("transform", (d, i) => `translate(${(i-1)*legendSpacing},0)`);
+
+    eachLegend.append("circle")
+        .attr("r", 14)
+        .attr("cx", 0)
+        .attr("cy", -5)
+        .attr("fill", d => d.color)
+        .attr("fill-opacity", d => d.fillOpacity)
+        .attr("stroke", d => d.stroke)
+        .attr("stroke-width", 2)
+        .attr("stroke-opacity", 0.6);
+
+    eachLegend.append("text")
+        .attr("x", 22)
+        .attr("y", 0)
+        .style("font-family", "Roboto, sans-serif")
+        .style("font-size", "13px")
+        .style("fill", textDark)
+        .text(d => d.label);
+
+}
+
+renderClosingSummary();
+
 /**
  * Adds color legend to the visualization
  */
