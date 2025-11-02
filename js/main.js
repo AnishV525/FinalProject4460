@@ -13,6 +13,146 @@ Promise.all([
     console.error("Error loading the CSV data: ", error);
 });
 
+/**
+ * Scroll animation observer - triggers animations when sections come into view
+ */
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.15, // Trigger when 15% of element is visible
+        rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                // Optional: Unobserve after animation to improve performance
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all sections that should animate
+    const sectionsToAnimate = document.querySelectorAll('.vis-section, .preface-section-small');
+    sectionsToAnimate.forEach(section => {
+        observer.observe(section);
+    });
+}
+
+/**
+ * Initialize section progress indicator
+ */
+function initSectionIndicator() {
+    const indicatorBubbles = document.querySelector('.indicator-bubbles');
+    
+    // Only get main sections (not preface cards), including thank you and data sources
+    const sections = document.querySelectorAll('.vis-section, .full-page-section, .thank-you-section, .data-sources-section');
+    
+    // Create bubbles for each main section
+    sections.forEach((section, index) => {
+        const bubble = document.createElement('div');
+        bubble.className = 'indicator-bubble';
+        bubble.dataset.sectionIndex = index;
+        bubble.addEventListener('click', () => {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        indicatorBubbles.appendChild(bubble);
+    });
+    
+    // Update active bubble based on scroll position
+    const updateActiveBubble = () => {
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        const allElements = document.querySelectorAll('.vis-section, .full-page-section, .preface-section-small, .thank-you-section, .data-sources-section');
+        
+        let activeIndex = 0;
+        let bestMatch = null;
+        let closestDistance = Infinity;
+        
+        sections.forEach((section, sectionIndex) => {
+            const rect = section.getBoundingClientRect();
+            const sectionTop = rect.top + window.scrollY;
+            const sectionBottom = sectionTop + rect.height;
+            
+            // Check if viewport center is within this section
+            if (viewportCenter >= sectionTop && viewportCenter < sectionBottom) {
+                const distance = Math.abs(viewportCenter - (sectionTop + rect.height / 2));
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    activeIndex = sectionIndex;
+                    bestMatch = section;
+                }
+            }
+            
+            // Also check if we're in a preface card that precedes this section
+            // Find the preface card immediately before this section
+            let prefaceCard = null;
+            for (let i = allElements.length - 1; i >= 0; i--) {
+                const el = allElements[i];
+                if (el.classList.contains('preface-section-small')) {
+                    const elRect = el.getBoundingClientRect();
+                    const elTop = elRect.top + window.scrollY;
+                    const elBottom = elTop + elRect.height;
+                    
+                    // Check if this preface card comes before the current section
+                    if (elBottom <= sectionTop) {
+                        // Check if viewport is in this preface card area
+                        if (viewportCenter >= elTop && viewportCenter < sectionTop) {
+                            const distance = Math.abs(viewportCenter - sectionTop);
+                            if (distance < closestDistance) {
+                                closestDistance = distance;
+                                activeIndex = sectionIndex;
+                                bestMatch = section;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // Check if we're between sections - if closer to this one, mark it active
+            if (viewportCenter < sectionTop) {
+                const distance = Math.abs(viewportCenter - sectionTop);
+                if (distance < closestDistance && distance < 200) { // Within 200px
+                    closestDistance = distance;
+                    activeIndex = sectionIndex;
+                    bestMatch = section;
+                }
+            }
+        });
+        
+        // Update bubble states
+        const bubbles = indicatorBubbles.querySelectorAll('.indicator-bubble');
+        bubbles.forEach((bubble, index) => {
+            if (index === activeIndex) {
+                bubble.classList.add('active');
+            } else {
+                bubble.classList.remove('active');
+            }
+        });
+    };
+    
+    // Update on scroll with throttling
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(updateActiveBubble, 50);
+    });
+    
+    // Initial update
+    updateActiveBubble();
+}
+
+// Initialize everything when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initScrollAnimations();
+        initSectionIndicator();
+    });
+} else {
+    initScrollAnimations();
+    initSectionIndicator();
+}
+
 
 /**
  * Processes raw shot data to calculate the share of each shot type.
