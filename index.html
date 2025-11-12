@@ -36,6 +36,9 @@
                     <a class="nav-link" href="#introduction">Introduction</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="#vis-court-context">Context</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#data-introduction">Mid-Range Shots</a>
                 </li>
                 <li class="nav-item">
@@ -106,6 +109,49 @@
         </div>
     </section>
 
+    <section id="vis-court-context" class="vis-section">
+        <div class="container vis-container">
+            <div class="row mb-4">
+                <div class="col-12 text-col text-center">
+                    <h2>Basketball Court & Player Positions</h2>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <img src="shot-chart-names.png" alt="Basketball Court" class="img-fluid" style="max-width: 40%; height: auto;">
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-col">
+                    <h3>Shot Zones Explained:</h3>
+                    <ul>
+                        <li><strong>Restricted Area (Paint):</strong> The most efficient area, closest to the basket, typically for layups and dunks.</li>
+                        <li><strong>Non-Restricted Paint / Floater Zone:</strong> Just outside the restricted area, still high-percentage.</li>
+                        <li><strong>Mid-Range:</strong> Shots taken between the paint and the three-point line. Value has decreased in the modern game.</li>
+                        <li><strong>Corner Three:</strong> A three-point shot taken from the corners of the court. Shorter than above-the-break threes.</li>
+                        <li><strong>Above-the-Break Three:</strong> Any three-point shot not from the corners, typically further from the basket.</li>
+                    </ul>
+                    <h3>Player Positions Explained:</h3>
+                    <ul>
+                        <li><strong>Guards (PG/SG):</strong> Often handle the ball, drive, and shoot from the perimeter (including 3s).</li>
+                        <li><strong>Forwards (SF/PF):</strong> Versatile players who can shoot, drive, rebound, and play defense inside and out.</li>
+                        <li><strong>Centers (C):</strong> Typically the tallest players, focused on scoring near the basket, rebounding, and blocking shots.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREFACE SECTION -->
+    <section id="context-preface" class="preface-section-small">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 px-0">
+                    <div class="preface-text-small">Now that you understand the different types of shot and the roles of players, let's explore how these have changed over the years.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- DATA INTRODUCTION SECTION -->
     <section id="data-introduction" class="vis-section">
         <div class="container vis-container">
@@ -165,33 +211,38 @@
     <!-- VISUALIZATION 3 & 4: Linked Interaction -->
     <section id="vis-efficiency" class="vis-section">
         <div class="container vis-container">
-            <!-- Part 1: Scatter Plot -->
-            <div class="row align-items-center mb-5">
-                <div class="col-12 col-md-4 text-col">
+
+            <div class="row mb-4">
+                <div class="col-12 text-col">
                     <h2>Definition of Efficiency</h2>
                     <p>Efficiency has always mattered in basketball, but how it's achieved has changed from 2014 to 2024 because the 3-point shot is prioritized.</p>
                     <p>In the past, efficient scorers focused on taking high-percentage shots near the rim or balanced mid-range jumpers. In today's NBA, efficiency is defined by shot value... trading twos for threes and maximizing points per attempt.</p>
                     <p>The best adapt by finding a balance between volume and value, redefining what it means to score efficiently in the modern game.</p>
+                    <p><strong>Click and drag on the scatter plot</strong> to the left to select a group of players. This bar chart will automatically update to show where that highlighted group concentrates their attempts: corner threes vs. above-the-break threes.</p>
                 </div>
-                <div class="col-12 col-md-8">
+            </div>
+
+            <div class="row align-items-center mb-4">
+                <div class="col-12 col-md-6">
                     <div id="efficiency-scatter-plot" class="vis-placeholder-box">
                         <p class="vis-placeholder-text">[Vis 3: Scatter Plot with Brushing] will be rendered here.</p>
                     </div>
                 </div>
-            </div>
-            <!-- Part 2: Linked Bar Chart -->
-            <div class="row align-items-center interaction-row">
-                <div class="col-12 col-md-4 text-col">
-                    <h2>3-Point Shot Preferences</h2>
-                    <p><strong>Linked to the scatter plot above</strong>, it lets us see where the highlighted players concentrate their attempts in high-value shots: corner threes and above-the-break threes.</p>
-                    <p>We can double click to see how players with higher and lower efficiency/volume are taking their shots. Just another tool to think deeper into the 3 point shot.</p>
-                </div>
-                <div class="col-12 col-md-8">
+                <div class="col-12 col-md-6">
                     <div id="player-profile-chart" class="vis-placeholder-box">
                         <p class="vis-placeholder-text">[Vis 4: Linked Stacked Bar Chart] updates based on brushing Vis 3.</p>
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-12 text-col">
+                    <h2>3-Point Shot Preferences</h2>
+                    <p><strong>Linked to the scatter plot above</strong>, it lets us see where the highlighted players concentrate their attempts in high-value shots: corner threes and above-the-break threes.</p>
+                    <p>We can double click to see how players with higher and lower efficiency/volume are taking their shots. Just another tool to think deeper into the 3 point shot.</p>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -339,5 +390,6 @@
 
 <!-- own js files -->
 <script src="js/main.js"></script>
+<script src="js/context.js"></script>
 </body>
 </html>
