@@ -936,9 +936,39 @@ function createPositionMatrix(data2014, data2024) {
     // Calculate max percentage for consistent color scale
     const maxPercentage = d3.max([...matrix2014, ...matrix2024], d => d.percentage);
     
-    // Create separate visualizations
+    // Get the visible container to use its dimensions for both
+    const visibleContainer = d3.select("#position-matrix-chart-2014");
+    const containerRect = visibleContainer.node().getBoundingClientRect();
+    
+    // Temporarily show both containers to get proper dimensions, then create visualizations
+    d3.select("#position-matrix-chart-2014").style("display", "block");
+    d3.select("#position-matrix-chart-2024").style("display", "block");
+    
+    // Create both visualizations with the same dimensions
     createSinglePositionMatrix(matrix2014, "#position-matrix-chart-2014", "2014", maxPercentage);
     createSinglePositionMatrix(matrix2024, "#position-matrix-chart-2024", "2024", maxPercentage);
+    
+    // Now hide 2024 and show 2014
+    d3.select("#position-matrix-chart-2014").style("display", "block");
+    d3.select("#position-matrix-chart-2024").style("display", "none");
+    
+    // Set up toggle functionality
+    const toggleBtn = d3.select("#position-matrix-toggle button");
+    let currentSeason = "2014";
+    
+    toggleBtn.on("click", () => {
+        currentSeason = currentSeason === "2014" ? "2024" : "2014";
+        
+        if (currentSeason === "2014") {
+            d3.select("#position-matrix-chart-2014").style("display", "block");
+            d3.select("#position-matrix-chart-2024").style("display", "none");
+            toggleBtn.text("Switch to 2024");
+        } else {
+            d3.select("#position-matrix-chart-2014").style("display", "none");
+            d3.select("#position-matrix-chart-2024").style("display", "block");
+            toggleBtn.text("Switch to 2014");
+        }
+    });
 }
 
 /**

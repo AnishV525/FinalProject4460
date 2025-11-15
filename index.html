@@ -260,28 +260,31 @@
     <!-- VISUALIZATION 5 & 6: Position Matrix -->
     <section id="vis-position-matrix" class="vis-section">
         <div class="container vis-container">
-            <!-- Part 1: 2014 Heatmap -->
+            <!-- Part 1: What's My Role -->
             <div class="row align-items-center mb-5">
                 <div class="col-12 col-md-4 text-col">
                     <h2>What's My Role?</h2>
                     <p>Efficiency isn't just about individual skill; it's about playing your role. This matrix shows the shot diet for each position. It's clear that Guards, Forwards, and Centers have fundamentally different jobs on the court, specializing in different zones to maximize offensive output for the team.</p>
                 </div>
                 <div class="col-12 col-md-8">
-                    <div id="position-matrix-chart-2014" class="vis-placeholder-box">
-                        <p class="vis-placeholder-text">[Vis 5: Position Matrix Heatmap 2014] will be rendered here.</p>
+                    <div id="position-matrix-container" style="position: relative;">
+                        <div id="position-matrix-toggle" style="text-align: center; margin-bottom: 15px;">
+                            <button class="btn btn-primary" style="padding: 8px 20px; font-size: 14px;">Switch to 2024</button>
+                        </div>
+                        <div id="position-matrix-chart-2014" class="vis-placeholder-box" style="display: block;">
+                            <p class="vis-placeholder-text">[Vis 5: Position Matrix Heatmap 2014] will be rendered here.</p>
+                        </div>
+                        <div id="position-matrix-chart-2024" class="vis-placeholder-box" style="display: none;">
+                            <p class="vis-placeholder-text">[Vis 6: Position Matrix Heatmap 2024] will be rendered here.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Part 2: 2024 Heatmap -->
-            <div class="row align-items-center interaction-row">
-                <div class="col-12 col-md-4 text-col">
+            <!-- Part 2: How Roles Changed -->
+            <div class="row interaction-row">
+                <div class="col-12 text-col">
                     <h2>How Roles Changed</h2>
                     <p>Between 2014 and 2024, NBA shot distribution evolved dramatically across all positions. Guards shifted away from mid-range shots (−14%) toward three-pointers, especially above-the-break attempts (+9%), reflecting the rise of perimeter-focused offenses. Forwards showed a similar transformation, reducing mid-range attempts (−16%) while increasing both paint and corner-three efficiency. Centers maintained high restricted-area usage (~48%) but nearly abandoned mid-range looks (−17%), adopting more three-point attempts, signaling the growth of the "stretch five." Overall, the transition of shot selection to gain maximum efficiency within each of the roles is clear as day.</p>
-                </div>
-                <div class="col-12 col-md-8">
-                    <div id="position-matrix-chart-2024" class="vis-placeholder-box">
-                        <p class="vis-placeholder-text">[Vis 6: Position Matrix Heatmap 2024] will be rendered here.</p>
-                    </div>
                 </div>
             </div>
         </div>
