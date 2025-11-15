@@ -348,13 +348,35 @@ function createCourtHeatmap(data2014, data2024) {
         .style("position", "absolute").style("top", "8px").style("right", "8px").style("z-index", 2)
         .style("display", "flex").style("flex-direction", "column").style("gap", "8px").style("align-items", "flex-end");
 
+    const legend = container.append("div")
+        .attr("class", "court-bubble-legend")
+        .style("position", "absolute")
+        .style("left", "10px")
+        .style("top", "16px")
+        .style("padding", "8px 10px")
+        .style("background", "rgba(0,0,0,0.55)")
+        .style("border-radius", "8px")
+        .style("color", "#fff")
+        .style("font-size", "11px")
+        .style("line-height", "1.35")
+        .style("max-width", "130px")
+        .style("text-align", "center")
+        .style("pointer-events", "none")
+        .html(`
+        <div style="font-weight:600; margin-bottom:4px;">Shot Attempts</div>
+        <div>
+            Larger / darker circles represents<br>
+            more attempts in that space.
+        </div>
+    `);
+
     const btnGroup = controls.append("div").attr("class", "btn-group btn-group-sm");
     const filterButtons = [
         { key: "ALL", label: "All" },
         { key: "3PT", label: "3PT" },
         { key: "2PT", label: "2PT" }
     ];
-    let shotFilter = "ALL"; // default to showing all shots
+    let shotFilter = "ALL";
 
     filterButtons.forEach((b, i) =>
         btnGroup.append("button")
